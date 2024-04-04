@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
-import { Button,StyleSheet,Text,TextInput,View } from 'react-native';
+import React,{ useState } from 'react';
+import { Button,StyleSheet,Text,TextInput,View,ScrollView,FlatList } from 'react-native';
 
 export default function App() {
-const [enteredGoalText, setEnteredGoalText] = useState('')
+  const [enteredGoalText,setEnteredGoalText] = useState('')
+  const [courseGoals,setCourseGoals] = useState([])
 
   function goalInputHandler(enteredText) {
     setEnteredGoalText(enteredText);
   }
 
   function addGoalHandler() {
-console.log(enteredGoalText);
+    setCourseGoals((currentCourseGoals) => [ // this approach (function) is better then just add [...currentCourseGoals, enteredGoalText] when state is depending on previous state
+      ...currentCourseGoals,
+      {text: enteredGoalText, id: Math.random().toString()}
+    ]);
+    setEnteredGoalText('')
   }
 
 
@@ -24,7 +29,21 @@ console.log(enteredGoalText);
         <Button title='Add goal' onPress={addGoalHandler} />
       </View>
       <View style={styles.goalsContainer}>
-        <Text>List of goals...</Text>
+        <FlatList
+          data={courseGoals}
+          renderItem={(itemData) => {
+            return (
+              <View style={styles.goalItem}>
+                <Text style={styles.goalText}>{itemData.item.text}</Text>
+              </View>
+            )
+          }}
+          keyExtractor={(item,index) => {
+            return item.id
+          }
+          }
+          alwaysBounceVertical={false} />
+
       </View>
     </View>
   );
@@ -35,7 +54,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     paddingHorizontal: 16,
-    backgroundColor: '#e8f4ff'
   },
   inputContainer: {
     flex: 1,
@@ -55,5 +73,14 @@ const styles = StyleSheet.create({
   },
   goalsContainer: {
     flex: 4
+  },
+  goalItem: {
+    margin: 8,
+    borderRadius: 6,
+    backgroundColor: '#5e0acc',
+    padding: 8,
+  },
+  goalText: {
+    color: 'white'
   }
 });
